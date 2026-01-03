@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Love Arcade — Taylynn 💕</title>
+
+<style>
+:root{
+  --bg1:#0a1128;
+  --bg2:#1a2847;
+  --accent:#ff6b9d;
+}
+body.blue{
+  --bg1:#081a2f;
+  --bg2:#0f3057;
+  --accent:#4da3ff;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:Segoe UI,sans-serif;
+  background:linear-gradient(180deg,var(--bg1),var(--bg2));
+  color:white;
+  min-height:100vh;
+  padding:20px;
+  transition:.4s;
+}
+.container{max-width:1100px;margin:auto;}
+h1,h2{text-align:center;font-weight:300;}
+button{
+  background:linear-gradient(135deg,var(--accent),#c44569);
+  border:none;color:white;
+  padding:14px 28px;
+  border-radius:30px;
+  font-weight:600;
+  cursor:pointer;
+}
+header{margin-bottom:30px;}
+.love-message{
+  background:rgba(255,255,255,.06);
+  padding:25px;border-radius:15px;
+  line-height:1.6;margin-bottom:25px;
+}
+.games-section{display:none;}
+.games-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:20px;
+}
+.game-card{
+  background:rgba(255,255,255,.08);
+  padding:22px;border-radius:15px;
+  cursor:pointer;
+}
+.game-icon{font-size:2.5em;}
+.modal{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.85);
+  justify-content:center;align-items:center;
+  z-index:999;
+}
+.modal.active{display:flex;}
+.modal-content{
+  background:linear-gradient(180deg,var(--bg2),var(--bg1));
+  padding:30px;border-radius:20px;
+  width:100%;max-width:520px;
+}
+.close-btn{
+  position:absolute;right:20px;top:20px;
+  font-size:1.6em;background:none;
+  color:white;border:none;cursor:pointer;
+}
+.grid{display:grid;gap:10px;margin:20px 0;}
+.memory-grid{grid-template-columns:repeat(4,1fr);}
+.card{
+  aspect-ratio:1;
+  background:rgba(255,255,255,.15);
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:2em;cursor:pointer;
+}
+.card.flipped{background:var(--accent);}
+.card.matched{background:#4caf50;}
+.color-grid{grid-template-columns:repeat(3,1fr);}
+.color-box{aspect-ratio:1;border-radius:10px;cursor:pointer;}
+.whack-grid{grid-template-columns:repeat(3,1fr);}
+.mole{
+  aspect-ratio:1;border-radius:50%;
+  background:rgba(255,255,255,.15);
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.5em;cursor:pointer;
+}
+canvas{
+  background:rgba(255,255,255,.08);
+  border-radius:10px;
+  display:block;margin:15px auto;
+}
+.controls{display:flex;justify-content:center;gap:20px;}
+footer{text-align:center;opacity:.7;margin-top:40px;}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<div id="landing">
+  <header><h1>Love Arcade 💕</h1></header>
+  <div class="love-message">
+    Hi baby 🥺💗  
+    I made this arcade just for you.
+  </div>
+  <div style="text-align:center;">
+    <button id="playBtn">Play</button>
+    <button id="themeBtn">Theme</button>
+  </div>
+</div>
+
+<div id="games" class="games-section">
+<header><h1>Choose a Game</h1></header>
+<div class="games-grid">
+  <div class="game-card" data-game="memory"><div class="game-icon">🧠</div>Memory Match</div>
+  <div class="game-card" data-game="race"><div class="game-icon">🏎️</div>Speed Racer</div>
+  <div class="game-card" data-game="color"><div class="game-icon">🎨</div>Color Rush</div>
+  <div class="game-card" data-game="mole"><div class="game-icon">🔨</div>Whack-a-Mole</div>
+  <div class="game-card" data-game="puzzle"><div class="game-icon">🧩</div>Slide Puzzle</div>
+</div>
+</div>
+
+<!-- MEMORY -->
+<div id="memory-modal" class="modal"><div class="modal-content">
+<button class="close-btn">×</button>
+<h2>Memory Match</h2>
+<div class="grid memory-grid" id="memoryGrid"></div>
+<p>Moves: <span id="moves">0</span></p>
+</div></div>
+
+<!-- RACE -->
+<div id="race-modal" class="modal"><div class="modal-content">
+<button class="close-btn">×</button>
+<h2>Speed Racer</h2>
+<canvas id="raceCanvas" width="300" height="400"></canvas>
+<div class="controls">
+<button id="leftBtn">⬅️</button>
+<button id="rightBtn">➡️</button>
+</div>
+<p>Score: <span id="score">0</span></p>
+</div></div>
+
+<!-- COLOR -->
+<div id="color-modal" class="modal"><div class="modal-content">
+<button class="close-btn">×</button>
+<h2>Color Rush</h2>
+<p>Tap: <b id="colorWord"></b></p>
+<div class="grid color-grid" id="colorGrid"></div>
+<p>Score: <span id="colorScore">0</span></p>
+</div></div>
+
+<!-- MOLE -->
+<div id="mole-modal" class="modal"><div class="modal-content">
+<button class="close-btn">×</button>
+<h2>Whack-a-Mole</h2>
+<div class="grid whack-grid" id="moleGrid"></div>
+<p>Score: <span id="moleScore">0</span></p>
+</div></div>
+
+<!-- PUZZLE -->
+<div id="puzzle-modal" class="modal"><div class="modal-content">
+<button class="close-btn">×</button>
+<h2>Slide Puzzle</h2>
+<div class="grid" id="puzzleGrid"></div>
+</div></div>
+
+<footer>Made with love for Taylynn 💕</footer>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+
+/* DOM */
+const playBtn=document.getElementById("playBtn");
+const themeBtn=document.getElementById("themeBtn");
+const landing=document.getElementById("landing");
+const games=document.getElementById("games");
+
+/* BASIC NAV */
+playBtn.onclick=()=>{
+  landing.style.display="none";
+  games.style.display="block";
+};
+themeBtn.onclick=()=>document.body.classList.toggle("blue");
+
+/* MODALS */
+document.querySelectorAll(".game-card").forEach(card=>{
+  card.onclick=()=>document.getElementById(card.dataset.game+"-modal").classList.add("active");
+});
+document.querySelectorAll(".close-btn").forEach(btn=>{
+  btn.onclick=()=>document.querySelectorAll(".modal").forEach(m=>m.classList.remove("active"));
+});
+
+/* MEMORY MATCH */
+const emojis=["😂","🔥","⭐","🍕","🎮","🎵","😎","💥"];
+let deck=[...emojis,...emojis].sort(()=>Math.random()-.5);
+let flipped=[],moves=0;
+const mg=document.getElementById("memoryGrid");
+const movesSpan=document.getElementById("moves");
+function initMemory(){
+  mg.innerHTML="";moves=0;movesSpan.textContent=0;
+  deck.forEach(e=>{
+    const c=document.createElement("div");
+    c.className="card";c.textContent="❓";
+    c.onclick=()=>{
+      if(c.classList.contains("flipped")||flipped.length==2)return;
+      c.textContent=e;c.classList.add("flipped");flipped.push(c);
+      if(flipped.length==2){
+        moves++;movesSpan.textContent=moves;
+        setTimeout(()=>{
+          if(flipped[0].textContent===flipped[1].textContent){
+            flipped.forEach(x=>x.classList.add("matched"));
+          }else{
+            flipped.forEach(x=>{x.textContent="❓";x.classList.remove("flipped");});
+          }
+          flipped=[];
+        },500);
+      }
+    };
+    mg.appendChild(c);
+  });
+}
+initMemory();
+
+/* RACING */
+const canvas=document.getElementById("raceCanvas");
+const ctx=canvas.getContext("2d");
+let carX=130,score=0,obs=[],raceInt;
+document.getElementById("raceCanvas").onclick=()=>{
+  clearInterval(raceInt);
+  raceInt=setInterval(()=>{
+    ctx.clearRect(0,0,300,400);
+    ctx.fillRect(carX,340,40,50);
+    if(Math.random()<.03)obs.push({x:Math.random()*260,y:-40});
+    obs.forEach(o=>{
+      o.y+=4;ctx.fillRect(o.x,o.y,40,40);
+      if(o.y>330&&o.x<carX+40&&o.x+40>carX){clearInterval(raceInt);alert("Crash 😭");}
+    });
+    obs=obs.filter(o=>o.y<420);
+    score++;document.getElementById("score").textContent=score;
+  },30);
+};
+leftBtn.onclick=()=>carX=Math.max(0,carX-20);
+rightBtn.onclick=()=>carX=Math.min(260,carX+20);
+
+/* COLOR */
+const colors=[{n:"RED",c:"red"},{n:"BLUE",c:"blue"},{n:"GREEN",c:"green"}];
+let cScore=0;
+function newColor(){
+  colorGrid.innerHTML="";
+  const pick=colors[Math.floor(Math.random()*3)];
+  colorWord.textContent=pick.n;
+  colors.forEach(col=>{
+    const b=document.createElement("div");
+    b.className="color-box";b.style.background=col.c;
+    b.onclick=()=>{if(col.n===pick.n)cScore++;colorScore.textContent=cScore;newColor();}
+    colorGrid.appendChild(b);
+  });
+}
+newColor();
+
+/* MOLE */
+let mScore=0;
+setInterval(()=>{
+  moleGrid.innerHTML="";
+  for(let i=0;i<9;i++){
+    const m=document.createElement("div");
+    m.className="mole";
+    if(Math.random()<.2)m.textContent="🐹";
+    m.onclick=()=>{if(m.textContent){mScore++;moleScore.textContent=mScore;m.textContent="";}}
+    moleGrid.appendChild(m);
+  }
+},900);
+
+/* PUZZLE */
+let nums=[1,2,3,4,5,6,7,8,""];
+function drawPuzzle(){
+  puzzleGrid.innerHTML="";
+  nums.forEach((n,i)=>{
+    const d=document.createElement("div");
+    d.className="card";d.textContent=n;
+    d.onclick=()=>{
+      const e=nums.indexOf("");
+      if([i-1,i+1,i-3,i+3].includes(e)){
+        [nums[i],nums[e]]=[nums[e],nums[i]];
+        drawPuzzle();
+      }
+    };
+    puzzleGrid.appendChild(d);
+  });
+}
+drawPuzzle();
+
+});
+</script>
+</body>
+</html>
