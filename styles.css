@@ -1,7 +1,0 @@
-:root{--bg:#0f172a;--accent:#ff4d6d;--muted:#9aa4b2}
-*{box-sizing:border-box}
-html,body{height:100%;margin:0;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#071029 0%,var(--bg) 100%);color:#fff}
-header{padding:2rem;text-align:center}
-#hero{display:flex;align-items:center;justify-content:center;height:60vh}
-#playBtn{background:var(--accent);border:none;padding:1rem 2rem;border-radius:999px;color:#fff;font-size:1.1rem;cursor:pointer}
-#playBtn:hover{filter:brightness(.95)}
