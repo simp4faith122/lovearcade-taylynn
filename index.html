@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love Arcade - Taylynn</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(180deg, #0a1128 0%, #1a2847 50%, #2a3f5f 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            color: #e8eaf6;
+            font-weight: 300;
+        }
+
+        .love-message {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            line-height: 1.6;
+            font-size: 1.1em;
+            color: #b8c5d6;
+        }
+
+        .play-btn-container {
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        .main-play-btn {
+            background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+            color: white;
+            border: none;
+            padding: 18px 60px;
+            border-radius: 50px;
+            font-size: 1.3em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 20px rgba(255, 107, 157, 0.3);
+        }
+
+        .main-play-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(255, 107, 157, 0.4);
+        }
+
+        .games-section {
+            display: none;
+        }
+
+        .games-section.active {
+            display: block;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 107, 157, 0.5);
+        }
+
+        .game-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        .game-title {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #e8eaf6;
+        }
+
+        .game-description {
+            color: #b8c5d6;
+            line-height: 1.5;
+            font-size: 0.95em;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(180deg, #1a2847 0%, #0a1128 100%);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.8em;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 107, 157, 0.3);
+        }
+
+        .game-area {
+            margin-top: 20px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 107, 157, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .score-display {
+            font-size: 1.3em;
+            margin: 15px 0;
+            text-align: center;
+            color: #e8eaf6;
+        }
+
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .memory-card {
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .memory-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .memory-card.flipped {
+            background: rgba(255, 107, 157, 0.3);
+            border-color: #ff6b9d;
+        }
+
+        .memory-card.matched {
+            background: rgba(76, 175, 80, 0.3);
+            cursor: default;
+            border-color: #4caf50;
+        }
+
+        .message {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        canvas {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            display: block;
+            margin: 20px auto;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .color-box {
+            aspect-ratio: 1;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 3px solid transparent;
+        }
+
+        .color-box:hover {
+            transform: scale(1.05);
+            border-color: white;
+        }
+
+        .whack-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .mole-hole {
+            aspect-ratio: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .mole-hole:active {
+            transform: scale(0.95);
+        }
+
+        .mole-hole.active {
+            background: rgba(255, 107, 157, 0.2);
+            border-color: #ff6b9d;
+        }
+
+        .puzzle-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin: 20px auto;
+        }
+
+        .puzzle-piece {
+            position: absolute;
+            background: rgba(255, 107, 157, 0.2);
+            border: 2px solid rgba(255, 107, 157, 0.5);
+            border-radius: 5px;
+            cursor: move;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .puzzle-piece:hover {
+            background: rgba(255, 107, 157, 0.3);
+            transform: scale(1.05);
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .game-over-screen {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .game-over-screen.active {
+            display: block;
+        }
+
+        .game-over-screen h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #ff6b9d;
+        }
+
+        .game-over-screen .final-score {
+            font-size: 1.5em;
+            margin: 15px 0;
+            color: #e8eaf6;
+        }
+
+        .racing-track {
+            position: relative;
+            margin: 20px 0;
+        }
+
+        .car {
+            position: absolute;
+            font-size: 2em;
+            transition: left 0.1s;
+        }
+
+        .obstacle {
+            position: absolute;
+            font-size: 2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="landing-page">
+            <header>
+                <h1>Love Arcade — Taylynn</h1>
+            </header>
+
+            <div class="love-message">
+                Hi baby, I thought I'd also make this for you cause idk, I love you and you also deserve to play games. I wanted to create something special just for you - a little arcade where you can have fun whenever you want. Each game here is made with love, just like everything I do for you. Hope you enjoy playing these as much as I enjoyed making them for you! 💕
+            </div>
+
+            <div class="play-btn-container">
+                <button class="main-play-btn" id="main-play-button">Play</button>
+            </div>
+        </div>
+
+        <div id="games-section" class="games-section">
+            <header>
+                <h1>Choose Your Game</h1>
+            </header>
+
+            <div class="games-grid">
+                <div class="game-card" onclick="openGame('memory-match')">
+                    <div class="game-icon">🧠</div>
+                    <div class="game-title">Memory Match</div>
+                    <div class="game-description">Find matching pairs before time runs out! You have 60 seconds to complete the challenge.</div>
+                </div>
+
+                <div class="game-card" onclick="openGame('balloon-pop')">
+                    <div class="game-icon">🎈</div>
+                    <div class="game-title">Balloon Pop</div>
+                    <div class="game-description">Pop as many balloons as you can in 30 seconds! Click fast!</div>
+                </div>
+
+                <div class="game-card" onclick="openGame('color-match')">
+                    <div class="game-icon">🎨</div>
+                    <div class="game-title">Color Rush</div>
+                    <div class="game-description">Match the color name with the right color box as fast as you can!</div>
+                </div>
+
+                <div class="game-card" onclick="openGame('whack-mole')">
+                    <div class="game-icon">🔨</div>
+                    <div class="game-title">Whack-a-Mole</div>
+                    <div class="game-description">Test your reflexes! Tap the moles as they pop up before they disappear!</div>
+                </div>
+
+                <div class="game-card" onclick="openGame('slide-puzzle')">
+                    <div class="game-icon">🧩</div>
+                    <div class="game-title">Slide Puzzle</div>
+                    <div class="game-description">Arrange the tiles in order by sliding them into the empty space!</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Memory Match Modal -->
+    <div id="memory-match-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeGame('memory-match')">×</button>
+            <h2>🧠 Memory Match</h2>
+            <div id="memory-game-area" class="game-area">
+                <div class="stats-container">
+                    <div class="stat-box">Moves: <span id="memory-moves">0</span></div>
+                    <div class="stat-box">Time: <span id="memory-time">60</span>s</div>
+                </div>
+                <div class="memory-grid" id="memory-grid"></div>
+                <button id="memory-start-btn" onclick="startMemoryGame()">Start Game</button>
+            </div>
+            <div id="memory-game-over" class="game-over-screen">
+                <h2>Game Over!</h2>
+                <div class="final-score" id="memory-final-score"></div>
+                <button onclick="resetMemoryGame()">Play Again</button>
+                <button onclick="closeGame('memory-match')">Back to Games</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Balloon Pop Modal -->
+    <div id="balloon-pop-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeGame('balloon-pop')">×</button>
+            <h2>🎈 Balloon Pop</h2>
+            <div id="balloon-game-area" class="game-area">
+                <div class="stats-container">
+                    <div class="stat-box">Score: <span id="balloon-score">0</span></div>
+                    <div class="stat-box">Time: <span id="balloon-time">30</span>s</div>
+                </div>
+                <div id="balloon-container" style="position: relative; height: 400px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2);"></div>
+                <button id="balloon-start-btn" onclick="startBalloonGame()">Start Game</button>
+            </div>
+            <div id="balloon-game-over" class="game-over-screen">
+                <h2>Time's Up!</h2>
+                <div class="final-score" id="balloon-final-score"></div>
+                <button onclick="resetBalloonGame()">Play Again</button>
+                <button onclick="closeGame('balloon-pop')">Back to Games</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Color Match Modal -->
+    <div id="color-match-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeGame('color-match')">×</button>
+            <h2>🎨 Color Rush</h2>
+            <div id="color-game-area" class="game-area">
+                <div class="stats-container">
+                    <div class="stat-box">Score: <span id="color-score">0</span></div>
+                    <div class="stat-box">Time: <span id="color-time">30</span>s</div>
+                </div>
+                <div class="message" id="color-instruction">Click the box that matches: <span id="color-word" style="font-size: 1.5em; font-weight: bold;"></span></div>
+                <div class="color-grid" id="color-grid"></div>
+                <button id="color-start-btn" onclick="startColorGame()">Start Game</button>
+            </div>
+            <div id="color-game-over" class="game-over-screen">
+                <h2>Time's Up!</h2>
+                <div class="final-score" id="color-final-score"></div>
+                <button onclick="resetColorGame()">Play Again</button>
+                <button onclick="closeGame('color-match')">Back to Games</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Whack-a-Mole Modal -->
+    <div id="whack-mole-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeGame('whack-mole')">×</button>
+            <h2>🔨 Whack-a-Mole</h2>
+            <div id="mole-game-area" class="game-area">
+                <div class="stats-container">
+                    <div class="stat-box">Score: <span id="mole-score">0</span></div>
+                    <div class="stat-box">Time: <span id="mole-time">30</span>s</div>
+                </div>
+                <div class="whack-grid" id="whack-grid"></div>
+                <button id="mole-start-btn" onclick="startMoleGame()">Start Game</button>
+            </div>
+            <div id="mole-game-over" class="game-over-screen">
+                <h2>Time's Up!</h2>
+                <div class="final-score" id="mole-final-score"></div>
+                <button onclick="resetMoleGame()">Play Again</button>
+                <button onclick="closeGame('whack-mole')">Back to Games</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide Puzzle Modal -->
+    <div id="slide-puzzle-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeGame('slide-puzzle')">×</button>
+            <h2>🧩 Slide Puzzle</h2>
+            <div id="puzzle-game-area" class="game-area">
+                <div class="stats-container">
+                    <div class="stat-box">Moves: <span id="puzzle-moves">0</span></div>
+                    <div class="stat-box">Time: <span id="puzzle-time">0</span>s</div>
+                </div>
+                <div class="puzzle-container" id="puzzle-container"></div>
+                <button id="puzzle-start-btn" onclick="startPuzzleGame()">Start Game</button>
+            </div>
+            <div id="puzzle-game-over" class="game-over-screen">
+                <h2>Puzzle Solved! 🎉</h2>
+                <div class="final-score" id="puzzle-final-score"></div>
+                <button onclick="resetPuzzleGame()">Play Again</button>
+                <button onclick="closeGame('slide-puzzle')">Back to Games</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Show games section
+        function showGames() {
+            document.getElementById('landing-page').style.display = 'none';
+            document.getElementById('games-section').classList.add('active');
+        }
+
+        // Add event listener when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            const playButton = document.getElementById('main-play-button');
+            if (playButton) {
+                playButton.addEventListener('click', showGames);
+            }
+        });
+
+        // Game state variables
+        let memoryCards = [];
+        let flippedCards = [];
+        let memoryMoves = 0;
+        let memoryTimer = null;
+        let memoryTimeLeft = 60;
+        let memoryGameActive = false;
+
+        function openGame(gameId) {
+            document.getElementById(gameId + '-modal').classList.add('active');
+        }
+
+        function closeGame(gameId) {
+            document.getElementById(gameId + '-modal').classList.remove('active');
+            if (memoryTimer) clearInterval(memoryTimer);
+            if (colorTimer) clearInterval(colorTimer);
+            if (moleInterval) clearInterval(moleInterval);
+            if (moleTimer) clearInterval(moleTimer);
+            if (puzzleTimer) clearInterval(puzzleTimer);
+            if (balloonTimer) clearInterval(balloonTimer);
+            if (balloonSpawnInterval) clearInterval(balloonSpawnInterval);
+            memoryGameActive = false;
+            colorGameActive = false;
+            moleGameActive = false;
+            puzzleGameActive = false;
+            balloonGameActive = false;
+        }
+
+        // Memory Match Game
+        function startMemoryGame() {
+            const symbols = ['💕', '💖', '💗', '💝', '💘', '💓', '💞', '❤️'];
+            memoryCards = [...symbols, ...symbols].sort(() => Math.random() - 0.5);
+            flippedCards = [];
+            memoryMoves = 0;
+            memoryTimeLeft = 60;
+            memoryGameActive = true;
+            document.getElementById('memory-moves').textContent = memoryMoves;
+            document.getElementById('memory-time').textContent = memoryTimeLeft;
+            document.getElementById('memory-start-btn').textContent = 'Game in Progress...';
+            document.getElementById('memory-start-btn').disabled = true;
+            
+            const grid = document.getElementById('memory-grid');
+            grid.innerHTML = '';
+            
+            memoryCards.forEach((symbol, i) => {
+                const card = document.createElement('div');
+                card.className = 'memory-card';
+                card.dataset.index = i;
+                card.dataset.symbol = symbol;
+                card.textContent = '?';
+                card.onclick = () => flipCard(card);
+                grid.appendChild(card);
+            });
+
+            if (memoryTimer) clearInterval(memoryTimer);
+            memoryTimer = setInterval(() => {
+                memoryTimeLeft--;
+                document.getElementById('memory-time').textContent = memoryTimeLeft;
+                if (memoryTimeLeft <= 0) {
+                    endMemoryGame(false);
+                }
+            }, 1000);
+        }
+
+        function flipCard(card) {
+            if (!memoryGameActive || card.classList.contains('flipped') || card.classList.contains('matched') || flippedCards.length >= 2) {
+                return;
+            }
+            
+            card.classList.add('flipped');
+            card.textContent = card.dataset.symbol;
+            flippedCards.push(card);
+            
+            if (flippedCards.length === 2) {
+                memoryMoves++;
+                document.getElementById('memory-moves').textContent = memoryMoves;
+                
+                setTimeout(() => {
+                    if (flippedCards[0].dataset.symbol === flippedCards[1].dataset.symbol) {
+                        flippedCards.forEach(c => c.classList.add('matched'));
+                        
+                        if (document.querySelectorAll('.memory-card.matched').length === memoryCards.length) {
+                            endMemoryGame(true);
+                        }
+                    } else {
+                        flippedCards.forEach(c => {
+                            c.classList.remove('flipped');
+                            c.textContent = '?';
+                        });
+                    }
+                    flippedCards = [];
+                }, 800);
+            }
+        }
+
+        function endMemoryGame(won) {
+            memoryGameActive = false;
+            clearInterval(memoryTimer);
+            document.getElementById('memory-game-area').style.display = 'none';
+            document.getElementById('memory-game-over').classList.add('active');
+            const timeTaken = 60 - memoryTimeLeft;
+            if (won) {
+                document.getElementById('memory-final-score').innerHTML = `
+                    ✨ Congratulations! ✨<br>
+                    Moves: ${memoryMoves}<br>
+                    Time: ${timeTaken}s
+                `;
+            } else {
+                document.getElementById('memory-final-score').innerHTML = `
+                    Time's up! 😅<br>
+                    Moves: ${memoryMoves}<br>
+                    Better luck next time!
+                `;
+            }
+        }
+
+        function resetMemoryGame() {
+            document.getElementById('memory-game-over').classList.remove('active');
+            document.getElementById('memory-game-area').style.display = 'block';
+            document.getElementById('memory-start-btn').textContent = 'Start Game';
+            document.getElementById('memory-start-btn').disabled = false;
+            startMemoryGame();
+        }
+
+        // Balloon Pop Game
+        let balloonScore = 0;
+        let balloonTimeLeft = 30;
+        let balloonTimer = null;
+        let balloonSpawnInterval = null;
+        let balloonGameActive = false;
+        let balloonCounter = 0;
+
+        function startBalloonGame() {
+            balloonScore = 0;
+            balloonTimeLeft = 30;
+            balloonGameActive = true;
+            balloonCounter = 0;
+            document.getElementById('balloon-score').textContent = balloonScore;
+            document.getElementById('balloon-time').textContent = balloonTimeLeft;
+            document.getElementById('balloon-start-btn').textContent = 'Game in Progress...';
+            document.getElementById('balloon-start-btn').disabled = true;
+            
+            const container = document.getElementById('balloon-container');
+            container.innerHTML = '';
+            
+            if (balloonTimer) clearInterval(balloonTimer);
+            if (balloonSpawnInterval) clearInterval(balloonSpawnInterval);
+            
+            balloonTimer = setInterval(() => {
+                balloonTimeLeft--;
+                document.getElementById('balloon-time').textContent = balloonTimeLeft;
+                if (balloonTimeLeft <= 0) {
+                    endBalloonGame();
+                }
+            }, 1000);
+            
+            balloonSpawnInterval = setInterval(spawnBalloon, 600);
+        }
+
+        function spawnBalloon() {
+            if (!balloonGameActive) return;
+            
+            const container = document.getElementById('balloon-container');
+            const balloon = document.createElement('div');
+            const colors = ['#ff6b9d', '#4ecdc4', '#95e1d3', '#ffe66d', '#c471ed', '#ffa07a'];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            const size = 60 + Math.random() * 40;
+            
+            balloon.style.position = 'absolute';
+            balloon.style.width = size + 'px';
+            balloon.style.height = size + 'px';
+            balloon.style.borderRadius = '50%';
+            balloon.style.background = randomColor;
+            balloon.style.left = Math.random() * (container.offsetWidth - size) + 'px';
+            balloon.style.bottom = '-100px';
+            balloon.style.cursor = 'pointer';
+            balloon.style.transition = 'bottom 3s linear';
+            balloon.style.boxShadow = '0 5px 15px rgba(0,0,0,0.3)';
+            balloon.dataset.id = balloonCounter++;
+            
+            balloon.onclick = function() {
+                if (balloonGameActive) {
+                    balloonScore++;
+                    document.getElementById('balloon-score').textContent = balloonScore;
+                    this.style.transition = 'all 0.2s';
+                    this.style.transform = 'scale(0)';
+                    setTimeout(() => this.remove(), 200);
+                }
+            };
+            
+            container.appendChild(balloon);
+            
+            setTimeout(() => {
+                if (balloon.parentNode) {
+                    balloon.style.bottom = container.offsetHeight + 'px';
+                }
+            }, 10);
+            
+            setTimeout(() => {
+                if (balloon.parentNode) {
+                    balloon.remove();
+                }
+            }, 3100);
+        }
+
+        function endBalloonGame() {
+            balloonGameActive = false;
+            clearInterval(balloonTimer);
+            clearInterval(balloonSpawnInterval);
+            document.getElementById('balloon-game-area').style.display = 'none';
+            document.getElementById('balloon-game-over').classList.add('active');
+            document.getElementById('balloon-final-score').innerHTML = `
+                🎈 Great Job! 🎈<br>
+                Balloons Popped: ${balloonScore}
+            `;
+        }
+
+        function resetBalloonGame() {
+            document.getElementById('balloon-game-over').classList.remove('active');
+            document.getElementById('balloon-game-area').style.display = 'block';
+            document.getElementById('balloon-start-btn').textContent = 'Start Game';
+            document.getElementById('balloon-start-btn').disabled = false;
+            startBalloonGame();
+        }
+
+        // Color Match Game
+        let colorScore = 0;
+        let colorTimeLeft = 30;
+        let colorTimer = null;
+        let colorGameActive = false;
+        const colors = [
+            {name: 'RED', hex: '#ff6b6b'},
+            {name: 'BLUE', hex: '#4ecdc4'},
+            {name: 'GREEN', hex: '#95e1d3'},
+            {name: 'YELLOW', hex: '#ffe66d'},
+            {name: 'PURPLE', hex: '#c471ed'},
+            {name: 'ORANGE', hex: '#ffa07a'}
+        ];
+
+        function startColorGame() {
+            colorScore = 0;
+            colorTimeLeft = 30;
+            colorGameActive = true;
+            document.getElementById('color-score').textContent = colorScore;
+            document.getElementById('color-time').textContent = colorTimeLeft;
+            document.getElementById('color-start-btn').textContent = 'Game in Progress...';
+            document.getElementById('color-start-btn').disabled = true;
+            
+            if (colorTimer) clearInterval(colorTimer);
+            colorTimer = setInterval(() => {
+                colorTimeLeft--;
+                document.getElementById('color-time').textContent = colorTimeLeft;
+                if (colorTimeLeft <= 0) {
+                    endColorGame();
+                }
+            }, 1000);
+            
+            showColorRound();
+        }
+
+        function showColorRound() {
+            if (!colorGameActive) return;
+            const correctColor = colors[Math.floor(Math.random() * colors.length)];
+            const wrongColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            const word = document.getElementById('color-word');
+            word.textContent = correctColor.name;
+            word.style.color = wrongColor.hex;
+            
+            const grid = document.getElementById('color-grid');
+            const shuffled = [...colors].sort(() => Math.random() - 0.5).slice(0, 6);
+            if (!shuffled.includes(correctColor)) {
+                shuffled[0] = correctColor;
+            }
+            
+            grid.innerHTML = '';
+            shuffled.forEach(color => {
+                const box = document.createElement('div');
+                box.className = 'color-box';
+                box.style.background = color.hex;
+                box.onclick = () => checkColor(color.name === correctColor.name);
+                grid.appendChild(box);
+            });
+        }
+
+        function checkColor(correct) {
+            if (!colorGameActive) return;
+            if (correct) {
+                colorScore++;
+                document.getElementById('color-score').textContent = colorScore;
+                showColorRound();
+            } else {
+                colorScore = Math.max(0, colorScore - 1);
+                document.getElementById('color-score').textContent = colorScore;
+            }
+        }
+
+        function endColorGame() {
+            colorGameActive = false;
+            clearInterval(colorTimer);
+            document.getElementById('color-game-area').style.display = 'none';
+            document.getElementById('color-game-over').classList.add('active');
+            document.getElementById('color-final-score').innerHTML = `
+                🎨 Great Job! 🎨<br>
+                Final Score: ${colorScore}
+            `;
+        }
+
+        function resetColorGame() {
+            document.getElementById('color-game-over').classList.remove('active');
+            document.getElementById('color-game-area').style.display = 'block';
+            document.getElementById('color-start-btn').textContent = 'Start Game';
+            document.getElementById('color-start-btn').disabled = false;
+            startColorGame();
+        }
+
+        // Whack-a-Mole Game
+        let moleScore = 0;
+        let moleTimeLeft = 30;
+        let moleTimer = null;
+        let moleInterval = null;
+        let moleGameActive = false;
+
+        function startMoleGame() {
+            moleScore = 0;
+            moleTimeLeft = 30;
+            moleGameActive = true;
+            document.getElementById('mole-score').textContent = moleScore;
+            document.getElementById('mole-time').textContent = moleTimeLeft;
+            document.getElementById('mole-start-btn').textContent = 'Game in Progress...';
+            document.getElementById('mole-start-btn').disabled = true;
+            
+            const grid = document.getElementById('whack-grid');
+            grid.innerHTML = '';
+            for (let i = 0; i < 9; i++) {
+                const hole = document.createElement('div');
+                hole.className = 'mole-hole';
+                hole.dataset.index = i;
+                hole.onclick = () => whackMole(hole);
+                grid.appendChild(hole);
+            }
+            
+            if (moleTimer) clearInterval(moleTimer);
+            if (moleInterval) clearInterval(moleInterval);
+            
+            moleTimer = setInterval(() => {
+                moleTimeLeft--;
+                document.getElementById('mole-time').textContent = moleTimeLeft;
+                if (moleTimeLeft <= 0) {
+                    endMoleGame();
+                }
+            }, 1000);
+            
+            moleInterval = setInterval(showMole, 800);
+        }
+
+        function showMole() {
+            if (!moleGameActive) return;
+            const holes = document.querySelectorAll('.mole-hole');
+            holes.forEach(h => {
+                h.classList.remove('active');
+                h.textContent = '';
+            });
+            
+            const randomHole = holes[Math.floor(Math.random() * holes.length)];
+            randomHole.classList.add('active');
+            randomHole.textContent = '🐹';
+        }
+
+        function whackMole(hole) {
+            if (!moleGameActive) return;
+            if (hole.classList.contains('active')) {
+                moleScore++;
+                document.getElementById('mole-score').textContent = moleScore;
+                hole.classList.remove('active');
+                hole.textContent = '💥';
+                setTimeout(() => hole.textContent = '', 200);
+            }
+        }
+
+        function endMoleGame() {
+            moleGameActive = false;
+            clearInterval(moleTimer);
+            clearInterval(moleInterval);
+            document.getElementById('mole-game-area').style.display = 'none';
+            document.getElementById('mole-game-over').classList.add('active');
+            document.getElementById('mole-final-score').innerHTML = `
+                🔨 Nice Work! 🔨<br>
+                Final Score: ${moleScore}
+            `;
+        }
+
+        function resetMoleGame() {
+            document.getElementById('mole-game-over').classList.remove('active');
+            document.getElementById('mole-game-area').style.display = 'block';
+            document.getElementById('mole-start-btn').textContent = 'Start Game';
+            document.getElementById('mole-start-btn').disabled = false;
+            startMoleGame();
+        }
+
+        // Slide Puzzle Game
+        let puzzleTiles = [];
+        let emptyIndex = 8;
+        let puzzleMoves = 0;
+        let puzzleTime = 0;
+        let puzzleTimer = null;
+        let puzzleGameActive = false;
+
+        function startPuzzleGame() {
+            puzzleMoves = 0;
+            puzzleTime = 0;
+            puzzleGameActive = true;
+            document.getElementById('puzzle-moves').textContent = puzzleMoves;
+            document.getElementById('puzzle-time').textContent = puzzleTime;
+            document.getElementById('puzzle-start-btn').textContent = 'Game in Progress...';
+            document.getElementById('puzzle-start-btn').disabled = true;
+            
+            puzzleTiles = [1, 2, 3, 4, 5, 6, 7, 8, 0];
+            do {
+                puzzleTiles.sort(() => Math.random() - 0.5);
+            } while (!isSolvable(puzzleTiles));
+            
+            emptyIndex = puzzleTiles.indexOf(0);
+            renderPuzzle();
+            
+            if (puzzleTimer) clearInterval(puzzleTimer);
+            puzzleTimer = setInterval(() => {
+                if (puzzleGameActive) {
+                    puzzleTime++;
+                    document.getElementById('puzzle-time').textContent = puzzleTime;
+                }
+            }, 1000);
+        }
+
+        function renderPuzzle() {
+            const container = document.getElementById('puzzle-container');
+            container.innerHTML = '';
+            container.style.height = '400px';
+            
+            puzzleTiles.forEach((num, i) => {
+                if (num !== 0) {
+                    const piece = document.createElement('div');
+                    piece.className = 'puzzle-piece';
+                    piece.textContent = num;
+                    piece.style.width = '33.33%';
+                    piece.style.height = '33.33%';
+                    piece.style.left = (i % 3) * 33.33 + '%';
+                    piece.style.top = Math.floor(i / 3) * 33.33 + '%';
+                    piece.onclick = () => movePuzzlePiece(i);
+                    container.appendChild(piece);
+                }
+            });
+        }
+
+        function movePuzzlePiece(index) {
+            if (!puzzleGameActive) return;
+            const row = Math.floor(index / 3);
+            const col = index % 3;
+            const emptyRow = Math.floor(emptyIndex / 3);
+            const emptyCol = emptyIndex % 3;
+            
+            if ((Math.abs(row - emptyRow) === 1 && col === emptyCol) ||
+                (Math.abs(col - emptyCol) === 1 && row === emptyRow)) {
+                puzzleTiles[emptyIndex] = puzzleTiles[index];
+                puzzleTiles[index] = 0;
+                emptyIndex = index;
+                puzzleMoves++;
+                document.getElementById('puzzle-moves').textContent = puzzleMoves;
+                renderPuzzle();
+                
+                if (puzzleTiles.join('') === '123456780') {
+                    endPuzzleGame();
+                }
+            }
+        }
+
+        function isSolvable(tiles) {
+            let inversions = 0;
+            for (let i = 0; i < tiles.length; i++) {
+                for (let j = i + 1; j < tiles.length; j++) {
+                    if (tiles[i] && tiles[j] && tiles[i] > tiles[j]) {
+                        inversions++;
+                    }
+                }
+            }
+            return inversions % 2 === 0;
+        }
+
+        function endPuzzleGame() {
+            puzzleGameActive = false;
+            clearInterval(puzzleTimer);
+            document.getElementById('puzzle-game-area').style.display = 'none';
+            document.getElementById('puzzle-game-over').classList.add('active');
+            document.getElementById('puzzle-final-score').innerHTML = `
+                🎉 Puzzle Solved! 🎉<br>
+                Moves: ${puzzleMoves}<br>
+                Time: ${puzzleTime}s
+            `;
+        }
+
+        function resetPuzzleGame() {
+            document.getElementById('puzzle-game-over').classList.remove('active');
+            document.getElementById('puzzle-game-area').style.display = 'block';
+            document.getElementById('puzzle-start-btn').textContent = 'Start Game';
+            document.getElementById('puzzle-start-btn').disabled = false;
+            startPuzzleGame();
+        }
+    </script>
+</body>
+</html>
